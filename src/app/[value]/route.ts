@@ -25,10 +25,12 @@ interface UrlDoc {
 }
 
 export async function GET(
-  req: NextRequest,
-  { params }: { params: Record<string, string> }
+  req: NextRequest
 ) {
-  const { value } = params;
+  const value = req.nextUrl.searchParams.get("value");
+  if (!value) {
+    return NextResponse.json({ error: "Value parameter is missing" }, { status: 400 });
+  }
 
   try {
     const { db } = await connectToDatabase();
