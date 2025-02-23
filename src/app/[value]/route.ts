@@ -24,7 +24,14 @@ interface UrlDoc {
   long_url: string;
 }
 
-export async function GET(req: NextRequest, { params }) {
+// Define the params type explicitly based on the route
+type RouteParams = {
+  params: {
+    value: string;
+  };
+};
+
+export async function GET(req: NextRequest, { params }: RouteParams) {
   const { value } = params;
 
   try {
