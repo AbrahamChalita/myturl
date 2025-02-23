@@ -1,7 +1,6 @@
 import { MongoClient } from "mongodb";
-import { NextRequest, NextResponse } from "next/server"; // Import Next.js types
+import { NextRequest, NextResponse } from "next/server";
 
-// Cached MongoDB connection
 let cachedClient: MongoClient | null = null;
 let cachedDb: ReturnType<MongoClient["db"]> | null = null;
 
@@ -25,8 +24,7 @@ interface UrlDoc {
   long_url: string;
 }
 
-// Use Next.js built-in types for the route handler
-export async function GET(req: NextRequest, { params }: { params: { value: string } }) {
+export async function GET(req: NextRequest, { params }) {
   const { value } = params;
 
   try {
