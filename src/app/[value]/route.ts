@@ -1,25 +1,23 @@
 import { MongoClient } from "mongodb";
+import { NextRequest } from "next/server"; // Import Next.js type for request
 
+// Cached MongoDB connection
 let cachedClient: MongoClient | null = null;
-let cachedDb: ReturnType<MongoClient['db']> | null = null;
+let cachedDb: ReturnType<MongoClient["db"]> | null = null;
 
 async function connectToDatabase() {
   if (cachedClient && cachedDb) {
     return { client: cachedClient, db: cachedDb };
   }
 
-  const client = await MongoClient.connect(process.env.MONGODB_URI as string)
-  const db = client.db(process.env.DATABASE_NAME)
+  const client = await MongoClient.connect(process.env.MONGODB_URI as string, {
+    // Optional: Add connection options if needed
+  });
+  const db = client.db(process.env.DATABASE_NAME);
 
   cachedClient = client;
   cachedDb = db;
   return { client, db };
-}
-
-interface RequestParams {
-  params: {
-    value: string;
-  };
 }
 
 interface UrlDoc {
@@ -27,7 +25,8 @@ interface UrlDoc {
   long_url: string;
 }
 
-export async function GET(request: Request, { params }: RequestParams): Promise<Response> {
+// Use NextRequest and params directly instead of custom RequestParams
+export async function GET(request: NextRequest, { params }: { params: { value: string } }) {
   const { value } = params;
 
   try {
@@ -36,10 +35,10 @@ export async function GET(request: Request, { params }: RequestParams): Promise<
 
     const urlDoc = await collection.findOne({ short_code: value });
     if (!urlDoc) {
-      return new Response(
-        JSON.stringify({ error: "Short URL not found" }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Short URL not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
     }
     return new Response(null, {
       status: 302,
@@ -47,9 +46,9 @@ export async function GET(request: Request, { params }: RequestParams): Promise<
     });
   } catch (error) {
     console.error("Error in /[value]:", error);
-    return new Response(
-      JSON.stringify({ error: "Internal server error" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
