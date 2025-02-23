@@ -26,9 +26,9 @@ interface UrlDoc {
 
 export async function GET(
   req: NextRequest,
-  context: { params: { value: string } }
+  { params }: { params: Record<string, string> }
 ) {
-  const { value } = context.params;
+  const { value } = params;
 
   try {
     const { db } = await connectToDatabase();
