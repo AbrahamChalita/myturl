@@ -24,7 +24,10 @@ interface UrlDoc {
   long_url: string;
 }
 
-export async function GET(req: NextRequest, { params }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { value: string } }
+) {
   const { value } = params;
 
   try {
