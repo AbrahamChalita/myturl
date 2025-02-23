@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { MongoClient } from "mongodb";
 import { NextRequest, NextResponse } from "next/server";
 
