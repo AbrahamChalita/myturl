@@ -1,5 +1,5 @@
 import { MongoClient } from "mongodb";
-import { NextRequest } from "next/server"; // Import Next.js type for request
+import { NextRequest, NextResponse } from "next/server"; // Import Next.js types
 
 // Cached MongoDB connection
 let cachedClient: MongoClient | null = null;
@@ -25,8 +25,8 @@ interface UrlDoc {
   long_url: string;
 }
 
-// Use NextRequest and params directly instead of custom RequestParams
-export async function GET(request: NextRequest, { params }: { params: { value: string } }) {
+// Use Next.js built-in types for the route handler
+export async function GET(req: NextRequest, { params }: { params: { value: string } }) {
   const { value } = params;
 
   try {
@@ -35,20 +35,11 @@ export async function GET(request: NextRequest, { params }: { params: { value: s
 
     const urlDoc = await collection.findOne({ short_code: value });
     if (!urlDoc) {
-      return new Response(JSON.stringify({ error: "Short URL not found" }), {
-        status: 404,
-        headers: { "Content-Type": "application/json" },
-      });
+      return NextResponse.json({ error: "Short URL not found" }, { status: 404 });
     }
-    return new Response(null, {
-      status: 302,
-      headers: { Location: urlDoc.long_url },
-    });
+    return NextResponse.redirect(urlDoc.long_url, 302);
   } catch (error) {
     console.error("Error in /[value]:", error);
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
